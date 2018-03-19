@@ -1,0 +1,69 @@
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <iostream>
+#include <time.h>
+#include <string>
+using namespace std;
+
+
+int main(int argCount, char * argValues[]) {
+	DIR    *directory;
+	int     argNbr;
+	char   *argument;
+
+	if (argCount == 1) {
+		cout << "No directory given -- using current directory" << endl;
+		argument = ".";
+		directory = opendir(".");
+		if (directory != NULL) {
+			listDirectory(directory, argument);
+		}
+		else {
+			cout << "Failed to open directory." << endl;
+		}
+	}
+	else {
+		for (argNbr = 1; argNbr < argCount; argNbr++) {
+			argument = argValues[argNbr];
+			cout << "Processing Directory " << argument << endl;
+			directory = opendir(argument);
+			if (directory != NULL) {
+				listDirectory(directory, argument);
+			}
+			else {
+				cout << "Failed to open directory." << endl;
+			}
+			closedir(directory);
+		}
+	}
+	return 0;
+}
+
+
+
+void listDirectory(DIR *directory, char *dirName) {
+    struct dirent *entry;
+    string filename;
+    struct stat fileInfo;
+
+    while ((entry = readdir(directory)) != NULL){
+	filename = dirName;
+	filename = filename + "/";
+	filename = filename + entry->d_name;
+	lstat(filename.c_str(), &fileInfo);
+	cout << "Name    : " << filename << endl 
+	     << "I-node  : " << fileInfo.st_ino << endl
+	     << "Mode    : ";
+	decodeMode(fileInfo.st_mode);
+	cout << "User ID : " << fileInfo.st_uid << endl
+	     << "Group ID: " << fileInfo.st_gid << endl
+	     << "Size    : " << fileInfo.st_size << " bytes" << endl
+	     << "Last Access Time : " << ctime(&fileInfo.st_atime)
+	     << "Last Modify Time : " << ctime(&fileInfo.st_mtime)
+	     << "Creation Time    : " << ctime(&fileInfo.st_ctime);
+	
+    }
+    return;
+}
