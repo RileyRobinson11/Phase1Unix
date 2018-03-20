@@ -20,7 +20,7 @@ int main (int argCount, char *argValues[]) {
     FILE *fDescriptor;
     char line[LINESIZE];
 
-    fDescriptor = fopen("testfile.txt", "f");
+    fDescriptor = fopen("Datafile1.txt", "f");
     if (fDescriptor == NULL) { // Error 
         perror("Program Failed");
         exit(0);
